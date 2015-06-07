@@ -3,9 +3,9 @@ containers:
     setup:
     - !Ubuntu trusty
     - !UbuntuUniverse
-    - !Install [texlive-full, scalable-cyrfonts-tex]
+    - !Install [texlive, texlive-science, texlive-latex-extra, texlive-lang-cyrillic, scalable-cyrfonts-tex]
     - !Sh |
-       sed -i '20 a \\DeclareRobustCommand{\\No}{\\ifmmode{\\nfss@text{\\textnumero}}\\else\\textnumero\\fi}' /usr/share/texlive/texmf-dist/tex/generic/babel-russian/russianb.ldf
+       sed -i '116 a \\\DeclareRobustCommand{\\No}{\\ifmmode{\\nfss@text{\\textnumero}}\\else\\textnumero\\fi}' /usr/share/texlive/texmf-dist/tex/generic/babel-russian/russianb.ldf
 
 commands:
   shell: !Command
