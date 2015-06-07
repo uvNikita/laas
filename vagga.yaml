@@ -1,0 +1,15 @@
+containers:
+  latex:
+    setup:
+    - !Ubuntu trusty
+    - !UbuntuUniverse
+    - !Install [texlive-full, scalable-cyrfonts-tex]
+    - !Sh |
+       sed -i '20 a \\DeclareRobustCommand{\\No}{\\ifmmode{\\nfss@text{\\textnumero}}\\else\\textnumero\\fi}' /usr/share/texlive/texmf-dist/tex/generic/babel-russian/russianb.ldf
+
+commands:
+  shell: !Command
+    container: latex
+    run: bash
+    environ:
+      HOME: /tmp
