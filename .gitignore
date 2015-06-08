@@ -17,6 +17,9 @@ cabal.sandbox.config
 *.swp
 .vagga
 
+src
+output
+
 *.log
 *.pdf
 *.toc
