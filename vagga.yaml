@@ -14,9 +14,10 @@ commands:
     environ:
       HOME: /tmp
 
-  build: !Command
+  pdflatex: !Command
     container: latex
     work-dir: /work/src
-    run: pdflatex -output-directory /work/output main.tex 
+    run: pdflatex -output-directory /work/output $@
+    accepts-arguments: true
     environ:
       HOME: /tmp
