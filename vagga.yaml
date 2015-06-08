@@ -13,3 +13,10 @@ commands:
     run: bash
     environ:
       HOME: /tmp
+
+  build: !Command
+    container: latex
+    work-dir: /work/src
+    run: pdflatex -output-directory /work/output main.tex 
+    environ:
+      HOME: /tmp
