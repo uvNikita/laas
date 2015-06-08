@@ -16,3 +16,7 @@ cabal.sandbox.config
 *.hp
 *.swp
 .vagga
+
+*.log
+*.pdf
+*.toc

@@ -13,3 +13,11 @@ commands:
     run: bash
     environ:
       HOME: /tmp
+
+  pdflatex: !Command
+    container: latex
+    work-dir: /work/src
+    run: pdflatex -output-directory /work/output $@
+    accepts-arguments: true
+    environ:
+      HOME: /tmp
