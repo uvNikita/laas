@@ -16,7 +16,7 @@ commands:
 
   pdflatex: !Command
     container: latex
-    work-dir: /work/src
+    work-dir: /work/input
     run: pdflatex -output-directory /work/output $@
     accepts-arguments: true
     environ:
