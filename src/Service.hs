@@ -1,9 +1,11 @@
 {-# LANGUAGE RecordWildCards #-}
+
 module Main (
     main
 ) where
 
 import qualified Codec.Archive.Tar        as Tar
+import           Control.Applicative      (pure, (<$>), (<*>))
 import qualified Data.ByteString          as BS
 import           Data.Default             (def)
 import           System.Console.ArgParser (Descr (..), ParserSpec, andBy,
@@ -11,12 +13,11 @@ import           System.Console.ArgParser (Descr (..), ParserSpec, andBy,
                                            withParseResult)
 import           System.Daemon            (daemonPort, ensureDaemonRunning)
 import           System.Directory         (getTemporaryDirectory)
+import           System.FilePath          ((<.>), (</>))
 import           System.IO                (hClose)
 import           System.IO.Temp           (createTempDirectory,
                                            openBinaryTempFile)
-import System.Process (callProcess)
-import System.FilePath ((<.>), (</>))
-import Control.Applicative ((<$>), (<*>), pure)
+import           System.Process           (callProcess)
 
 import           Types
 

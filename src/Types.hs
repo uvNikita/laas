@@ -7,10 +7,10 @@ module Types (
 
 import           Data.ByteString (ByteString)
 import           Data.Serialize  (Serialize)
-import           GHC.Generics (Generic)
+import           GHC.Generics    (Generic)
 
-data Request = Request { mainName :: String
-                       , inputArchive  :: ByteString } deriving (Generic)
+data Request = Request { mainName     :: String
+                       , inputArchive :: ByteString } deriving (Generic)
 
 instance Serialize Request
 
