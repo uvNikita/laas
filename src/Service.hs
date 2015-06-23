@@ -1,3 +1,4 @@
+{-# LANGUAGE NamedFieldPuns  #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Main (
@@ -5,7 +6,7 @@ module Main (
 ) where
 
 import qualified Codec.Archive.Tar        as Tar
-import           Control.Applicative      (pure, (<$>), (<*>))
+import           Control.Applicative      ((<$>))
 import qualified Data.ByteString          as BS
 import           Data.Default             (def)
 import           System.Console.ArgParser (Descr (..), ParserSpec, andBy,
@@ -15,6 +16,7 @@ import           System.Daemon            (daemonPort, ensureDaemonRunning)
 import           System.Directory         (getTemporaryDirectory)
 import           System.FilePath          ((<.>), (</>))
 import           System.IO                (hClose)
+import           System.IO.Error          (tryIOError)
 import           System.IO.Temp           (createTempDirectory,
                                            openBinaryTempFile)
 import           System.Process           (callProcess)
@@ -44,17 +46,20 @@ service Settings {..} | daemonize = ensureDaemonRunning "laas" (def { daemonPort
                       | otherwise = error "Not implemented"
 
 handle :: Request -> IO Response
-handle (Request {..}) = do
+handle (Request { mainName, inputArchive }) = do
     tmp <- getTemporaryDirectory
-    (tarPath, hTar) <- openBinaryTempFile tmp "laas.tar"
+
+    (tarPath, hTar) <- openBinaryTempFile  tmp "laas_input.tar"
     BS.hPut hTar inputArchive
-    hClose hTar
+    hClose  hTar
 
-    contentsPath <- createTempDirectory tmp "laas_contents"
+    contentsPath    <- createTempDirectory tmp "laas_contents"
     Tar.extract contentsPath tarPath
-
-    callProcess "pdflatex" [mainName]
 
     let pdfPath = contentsPath </> mainName <.> "pdf"
 
-    Response <$> BS.readFile pdfPath
+    result <- tryIOError $ callProcess "pdflatex" [mainName]
+
+    case result of
+        Right _ -> Ok    <$> BS.readFile pdfPath
+        Left e  -> Error <$> return (show e)

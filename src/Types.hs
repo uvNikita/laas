@@ -9,12 +9,15 @@ import           Data.ByteString (ByteString)
 import           Data.Serialize  (Serialize)
 import           GHC.Generics    (Generic)
 
+type Tar = ByteString
+type PDF = ByteString
+
 data Request = Request { mainName     :: String
-                       , inputArchive :: ByteString } deriving (Generic)
+                       , inputArchive :: Tar } deriving (Generic)
 
 instance Serialize Request
 
 
-data Response = Response { outputPdf :: ByteString } deriving (Generic)
+data Response = Ok PDF | Error String deriving (Generic)
 
 instance Serialize Response
