@@ -7,18 +7,16 @@ module Main (
 
 import qualified Codec.Archive.Tar        as Tar
 import           Control.Applicative      ((<$>))
-import qualified Data.ByteString          as BS
+import qualified Data.ByteString.Lazy     as BS
 import           Data.Default             (def)
 import           System.Console.ArgParser (Descr (..), ParserSpec, andBy,
                                            boolFlag, optPos, parsedBy,
                                            withParseResult)
 import           System.Daemon            (daemonPort, ensureDaemonRunning)
-import           System.Directory         (getTemporaryDirectory)
-import           System.FilePath          ((<.>), (</>))
-import           System.IO                (hClose)
+import           System.FilePath          ((-<.>), (</>))
 import           System.IO.Error          (tryIOError)
-import           System.IO.Temp           (createTempDirectory,
-                                           openBinaryTempFile)
+import           System.IO.Temp           (withSystemTempDirectory)
+
 import           System.Process           (callProcess)
 
 import           Types
@@ -47,19 +45,14 @@ service Settings {..} | daemonize = ensureDaemonRunning "laas" (def { daemonPort
 
 handle :: Request -> IO Response
 handle (Request { mainName, inputArchive }) = do
-    tmp <- getTemporaryDirectory
+    withSystemTempDirectory "laas_contents" $ \ contentsPath -> do
+        Tar.unpack contentsPath $ Tar.read inputArchive
 
-    (tarPath, hTar) <- openBinaryTempFile  tmp "laas_input.tar"
-    BS.hPut hTar inputArchive
-    hClose  hTar
+        let pdfPath = contentsPath </> mainName -<.> "pdf"
+        let mainPath = contentsPath </> mainName
 
-    contentsPath    <- createTempDirectory tmp "laas_contents"
-    Tar.extract contentsPath tarPath
+        result <- tryIOError $ callProcess "pdflatex" ["-output-directory=" ++ contentsPath, mainPath]
 
-    let pdfPath = contentsPath </> mainName <.> "pdf"
-
-    result <- tryIOError $ callProcess "pdflatex" [mainName]
-
-    case result of
-        Right _ -> Ok    <$> BS.readFile pdfPath
-        Left e  -> Error <$> return (show e)
+        case result of
+            Right _ -> Ok    <$> BS.readFile pdfPath
+            Left  e -> Error <$> return (show e)

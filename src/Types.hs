@@ -5,9 +5,9 @@ module Types (
     , Response (..)
 ) where
 
-import           Data.ByteString (ByteString)
-import           Data.Serialize  (Serialize)
-import           GHC.Generics    (Generic)
+import           Data.ByteString.Lazy (ByteString)
+import           Data.Serialize       (Serialize)
+import           GHC.Generics         (Generic)
 
 type Tar = ByteString
 type PDF = ByteString
